@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title></title>
+    
+    <link rel="stylesheet" type="text/css" href="minesweeper_style.css">
+</head>
+<body onload="getInput();">
+    <div class="container">
+        <header>
+            
+        </header>
+        
+        <section class="upload-section">
+            <div class="upload-area" id="drop-area">
+                <p class="upload-text">拖放图片到此处或点击浏览</p>
+                <input type="file" id="file-input" class="file-input" accept="image/*">
+                <button class="browse-btn">选择图片</button>
+            </div>
+        </section>
+        
+        <section class="image-section" id="image-section">
+            <div class="image-container">
+                <div class="image-wrapper">
+                    <h3 class="image-title">上传的图片</h3>
+                    <canvas id="image-canvas"></canvas>
+                    <img id="uploaded-image" alt="上传的图片" style="display: none !important;">
+                </div>
+            </div>
+        </section>
+
+        总雷数：<input id="boom-number" type="text" onchange="changeBoomCnt()">
+        格子大小（px）：<input id="block-size" type="text" onchange="changeBlockSize()">
+        <div id="search-res"></div>
+
+        <div class="grid-div">
+            <div class="grid" id="grid"></div>
+        </div>
+    </div>
+
+    <script src="minesweeper_script.js"></script>
+</body>
+</html>
