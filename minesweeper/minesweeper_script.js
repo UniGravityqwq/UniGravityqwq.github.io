@@ -1,5 +1,71 @@
 let B=30;
 
+class BI{
+    update(){
+        while(Math.abs(this.v)>Number.MAX_SAFE_INTEGER)this.v/=10,this.k++;
+        // while(this.v<1)this.v*=10.0,this.k--;
+    }
+    BI(){
+        this.v=0,this.k=0;
+    }
+    // BI(v){
+    //     this.v=v,this.k=0,this.update();
+    // }
+    // BI(o){
+    //     this.v=o.v,this.k=o.k,this.update();
+    // }
+    toString() {
+        // let s='',tmp=[],x=Math.round(this.v);
+        // if(x<0)s+='-',x=-x;
+        // while(x){
+        //     tmp.push(x%10),x=(x-x%10)/10;
+        // }
+        // for(let i=tmp.length-1;i>=0;i--)s+=tmp[i];
+        return this.v+"x10^"+this.k;
+    }
+    getVal(){
+        return this.v*Math.pow(10,this.k);
+    }
+}
+function getBI(v){
+    let t=new BI();
+    t.v=v,t.k=0,t.update();
+    return t;
+}
+function copyBI(v){
+    let t=new BI();
+    t.v=v.v,v,t.k=v.k,t.update();
+    return t;
+}
+function BImul(x,y){
+    let z=new BI();
+    z.v=x.v*y.v,z.k=x.k+y.k,z.update();
+    return z;
+}
+function BIdiv(x,y){
+    let z=new BI();
+    z.v=x.v/y.v,z.k=x.k-y.k;
+    // while(z.v!=0&&Math.abs(z.v)<Number.MAX_SAFE_INTEGER)z.v*=10,z.k--;
+    z.update();
+    return z;
+}
+function BIadd(x1,y1){
+    let x=copyBI(x1),y=copyBI(y1);
+    // console.log(x+" "+y+":");
+    while(x.k<y.k)x.v/=10,x.k++;
+    while(y.k<x.k)y.v/=10,y.k++;
+    x.v+=y.v,x.update();
+    // console.log(""+x);
+    return x;
+}
+function BIdel(x1,y1){
+    let x=copyBI(x1),y=copyBI(y1);
+    while(x.k<y.k)x.v/=10,x.k++;
+    while(y.k<x.k)y.v/=10,y.k++;
+    x.v-=y.v,x.update();
+    return x;
+}
+
 document.addEventListener('DOMContentLoaded', function() {
     const dropArea = document.getElementById('drop-area');
     const fileInput = document.getElementById('file-input');
@@ -132,10 +198,10 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     // 组合数
     function C(n,m){
-        if(n<0||m<0||n<m)return 0.0;
+        if(n<0||m<0||n<m)return getBI(0);
         if(m*2>n)m=n-m;
-        let f=1.0;
-        for(let i=1;i<=m;i++)f=f*(n-i+1)/i;
+        let f=getBI(1);
+        for(let i=1;i<=m;i++)f=BImul(f,getBI((n-i+1)/i));
         return f;
     }
 
@@ -150,8 +216,16 @@ document.addEventListener('DOMContentLoaded', function() {
     function getdfn(x,y){
         if(!isSearchPoint(x,y))return;
         vis[x][y]=true,dfn.push([x,y]);
-        for(let u=-1;u<=1;u++)for(let v=-1;v<=1;v++)getdfn(x+u,y+v);
-        for(let u=-2;u<=2;u++)for(let v=-2;v<=2;v++)getdfn(x+u,y+v);
+        for(let nx=x-1;nx<=x+1;nx++)for(let ny=y-1;ny<=y+1;ny++)if(inRect(nx,ny)&&isNumber(nx,ny)){
+            for(let u=nx-1;u<=nx+1;u++)for(let v=ny-1;v<=ny+1;v++){
+                if(x-1<=u&&u<=x+1&&y-1<=v&&v<=y+1)getdfn(u,v);
+            }
+        }
+        for(let nx=x-1;nx<=x+1;nx++)for(let ny=y-1;ny<=y+1;ny++)if(inRect(nx,ny)&&isNumber(nx,ny)){
+            for(let u=nx-1;u<=nx+1;u++)for(let v=ny-1;v<=ny+1;v++){
+                getdfn(u,v);
+            }
+        }
     }
     function checkNumberBlock(x,y){
         let mn=0,mx=0;
@@ -223,12 +297,13 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // 搜索连通块方案数
-    let mustBeSelected;
+    let mustBeSelected,tmp=0;
     function searchVaildSolution(h,bombCur,ans){
         if(bombCur>notSureBombCnt)return;
         if(h>=dfn.length){
             // console.log(bombCur);
-            ans.add(bombCur,1);
+            ans.add(bombCur,1),tmp++;
+            // if(tmp%5000==0)console.log("块内搜索数："+tmp);
             return;
         }
         let x=dfn[h][0],y=dfn[h][1];
@@ -265,20 +340,23 @@ document.addEventListener('DOMContentLoaded', function() {
         for(let i=0;i<w;i++)for(let j=0;j<h;j++){
             if(!isSearchPoint(i,j))continue;
             dfn=[],getdfn(i,j);
+            console.log("发现的连通块："+dfn);
             let cntarr=new Poly();
             mustBeSelected=null,searchVaildSolution(0,0,cntarr);
             allBlockFreeRes=merge(allBlockFreeRes,cntarr);
             // console.log(allBlockFreeRes.a);
-            console.log("发现的连通块："+dfn+" | "+cntarr.a);
+            console.log("连通块方案数："+cntarr.a);
             blockDfn.push(dfn),blockFreeRes.push(cntarr);
             searchUsedStep+=cntarr.sum(),searchUsedStepMul*=cntarr.sum();
+            console.log("进行搜索次数："+searchUsedStep);
         }
-        let validSolutionCnt=0;
-        for(let i=0;i<allBlockFreeRes.a.length;i++)validSolutionCnt+=allBlockFreeRes.a[i]*chooseWeight[i];
+        let validSolutionCnt=getBI(0);
+        for(let i=0;i<allBlockFreeRes.a.length;i++)if(allBlockFreeRes.a[i])validSolutionCnt=BIadd(validSolutionCnt,BImul(getBI(allBlockFreeRes.a[i]),chooseWeight[i]));
         console.log("卷积后结果："+allBlockFreeRes.a);
         console.log("进行搜索次数："+searchUsedStep);
         console.log("边缘局面数："+searchUsedStepMul);
         console.log("全局局面数："+validSolutionCnt);
+        
         bombProbability=arrayInit(0),isBomb=arrayInit(false),isNotBomb=arrayInit(false);
         let len=blockDfn.length;
         let usedE=0;
@@ -297,9 +375,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 }else if(blockLimRes.equal(blockFreeRes[id])){
                     isBomb[x][y]=true,bombProbability[x][y]=1.0;
                 }else{
-                    let resArr=merge(otherBlockRes,blockLimRes),res=0;
-                    for(let i=0;i<resArr.a.length;i++)res+=resArr.a[i]*chooseWeight[i];
-                    bombProbability[x][y]=res/validSolutionCnt;
+                    let resArr=merge(otherBlockRes,blockLimRes),res=getBI(0);
+                    for(let i=0;i<resArr.a.length;i++)if(resArr.a[i])res=BIadd(res,BImul(getBI(resArr.a[i]),chooseWeight[i]));
+                    bombProbability[x][y]=BIdiv(res,validSolutionCnt).getVal();
                 }
                 usedE+=bombProbability[x][y];
             }
