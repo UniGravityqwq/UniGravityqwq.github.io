@@ -9,22 +9,27 @@ async function loadJSON(id) {
     }
 }
 
-async function searchContent() {
+async function DoInputSearch() {
     const searchValue = document.getElementById('searchInput').value.trim().toUpperCase();
-    const resultsContainer = document.getElementById('results');
+    
+    searchContent(searchValue);
+}
 
+async function searchContent(searchValue) {
+    const resultsContainer = document.getElementById('results');
+    
     // 清空结果容器
     resultsContainer.innerHTML = '';
     
-    errInput=0;
-    jsonData=0,results=0;
+    let errInput=0;
+    let jsonData=0,results=0;
 
     if (!searchValue) {
         errInput=1;
     }else{
         let searchValue2=searchValue.slice(1);
         numid=Number(searchValue2);
-        if(numid==NaN)errInput=1;
+        if(Number.isNaN(numid))errInput=1;
         else{
             qryid=0;
             if(1000<=numid&&numid<2000)qryid=1;
@@ -41,6 +46,12 @@ async function searchContent() {
             if(12000<=numid&&numid<13000)qryid=12;
             if(13000<=numid&&numid<14000)qryid=13;
             // if(14000<=numid&&numid<15000)qryid=14;
+
+            /*
+                冗余的 if 判断
+                qryid 的判断可以用更简洁的数学方式或 switch/case，或者直接用公式计算。
+                例如：qryid = Math.floor((numid - 1000) / 1000) + 1;，再判断范围。
+            */
 
             if(!qryid)errInput=1;
             else{
@@ -140,12 +151,27 @@ async function searchContent() {
 // 添加键盘支持
 document.getElementById('searchInput').addEventListener('keypress', function(e) {
     if (e.key === 'Enter') {
-        searchContent();
+        DoInputSearch();
     }
 });
 
 
+function getURLParams(url) {
+    const params = {};
+    const regex = /[?&]([^=#]+)=([^&#]*)/g;
+    let match;
+    while ((match = regex.exec(url)) !== null) {
+        params[decodeURIComponent(match[1])] = decodeURIComponent(match[2]);
+    }
+    return params;
+}
 
+const url = window.location.href;
+const params = getURLParams(url);
+
+if (params.ask) {
+    searchContent(params.ask);
+}
 
 
 // const actionBtn = document.getElementById('actionBtn');
