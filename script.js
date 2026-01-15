@@ -135,7 +135,11 @@ async function searchContent() {
         const btn4=document.getElementById("hintbtn4");const div4=document.getElementById("hintext4");const box4=document.getElementById("ansbox4");const customConfirm4=document.getElementById('customConfirm4');const confirmYes4=document.getElementById('confirmYes4');const confirmNo4=document.getElementById('confirmNo4');btn4.addEventListener("click",()=>{if(btn4.classList.contains("hintbtndown")){btn4.classList.toggle("hintbtndown");div4.classList.toggle("transhint");box4.classList.toggle("bigansbox");}else{customConfirm4.style.display='flex';}});confirmYes4.addEventListener('click',()=>{customConfirm4.style.display='none';btn4.classList.toggle("hintbtndown");div4.classList.toggle("transhint");box4.classList.toggle("bigansbox");});confirmNo4.addEventListener('click',()=>{customConfirm4.style.display='none';});
         const btn5=document.getElementById("hintbtn5");const div5=document.getElementById("hintext5");const box5=document.getElementById("ansbox5");const customConfirm5=document.getElementById('customConfirm5');const confirmYes5=document.getElementById('confirmYes5');const confirmNo5=document.getElementById('confirmNo5');btn5.addEventListener("click",()=>{if(btn5.classList.contains("hintbtndown")){btn5.classList.toggle("hintbtndown");div5.classList.toggle("transhint");box5.classList.toggle("bigansbox");}else{customConfirm5.style.display='flex';}});confirmYes5.addEventListener('click',()=>{customConfirm5.style.display='none';btn5.classList.toggle("hintbtndown");div5.classList.toggle("transhint");box5.classList.toggle("bigansbox");});confirmNo5.addEventListener('click',()=>{customConfirm5.style.display='none';});
     });
-    MathJax.typeset();
+    setTimeout(() => {
+        if (window.MathJax && window.MathJax.typeset) {
+            window.MathJax.typeset();
+        }
+    }, 100);
 }
 
 // 添加键盘支持
