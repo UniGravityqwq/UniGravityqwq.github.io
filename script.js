@@ -136,9 +136,7 @@ async function searchContent() {
         const btn5=document.getElementById("hintbtn5");const div5=document.getElementById("hintext5");const box5=document.getElementById("ansbox5");const customConfirm5=document.getElementById('customConfirm5');const confirmYes5=document.getElementById('confirmYes5');const confirmNo5=document.getElementById('confirmNo5');btn5.addEventListener("click",()=>{if(btn5.classList.contains("hintbtndown")){btn5.classList.toggle("hintbtndown");div5.classList.toggle("transhint");box5.classList.toggle("bigansbox");}else{customConfirm5.style.display='flex';}});confirmYes5.addEventListener('click',()=>{customConfirm5.style.display='none';btn5.classList.toggle("hintbtndown");div5.classList.toggle("transhint");box5.classList.toggle("bigansbox");});confirmNo5.addEventListener('click',()=>{customConfirm5.style.display='none';});
     });
     setTimeout(() => {
-        if (window.MathJax && window.MathJax.typeset) {
-            window.MathJax.typeset();
-        }
+        MathJax.typeset();
     }, 100);
 }
 
